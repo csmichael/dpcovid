@@ -5,12 +5,16 @@ We publish the source codes for the experiments.
 main.py contains the main codes. 
 
 # Prepare the dataset:
-Download the unzip Gowalla dataset at 
 
+## Gowalla dataset:
+
+Download the unzip Gowalla dataset:
 `wget http://snap.stanford.edu/data/loc-gowalla_totalCheckins.txt.gz`
+
+Unzip the file:
 `tar -zxvf loc-gowalla_totalCheckins.txt.gz`
 
-For the synthetic dataset:
+## Synthetic dataset:
 We've prepared the file 'df_synthetic_1600.csv' for basic testing on the synthetic dataset. For the scalability test, since the dataset is too large, readers could generate the code using:
 `python main.py --gen_synthetic`
 
