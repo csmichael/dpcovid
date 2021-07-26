@@ -675,6 +675,8 @@ def parse_arguments():
     parser.add_argument('--num_users', type=int, default=200, help='Number of users.')
     parser.add_argument('--randomly', action='store_true', default=False,
                         help='Random select patients.')
+    parser.add_argument('--gen_synthetic', action='store_true', default=False,
+                        help='Generate synthetic dataset.')
     parser.add_argument('--random_start', type=int, default=150, help='random start.')
     parser.add_argument('--num_rounds', type=int, default=1, help='Number of rounds.')
 
@@ -739,8 +741,8 @@ def gen_synthetic():
     df_data.to_csv('df_synthetic_'+str(100000)+'.csv', sep='\t', header=None)
 
 
-def compare_synthetic():
-    args = parse_arguments()
+def compare_synthetic(args):
+
     df = pd.read_csv('df_synthetic_'+str(100000)+'.csv', sep='\t', header=None)
     df.columns = ['rid', 'id', 'time', 'x', 'y', 'locId']
     uids = df.id.unique()
@@ -785,7 +787,10 @@ def compare_synthetic():
 
 
 if __name__ == '__main__':
-    # main()
-    compare_synthetic()
-    # gen_synthetic()
+    args = parse_arguments()
+    if args.gen_synthetic:
+        gen_synthetic()
+    else:
+        main(args)
+    #compare_synthetic()
 
