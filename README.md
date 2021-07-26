@@ -1,6 +1,6 @@
 # dpcovid_code
 
-We publish the source codes for the experiments. The commands are for Linux. 
+We publish the source codes for the experiments. 
 
 main.py contains the main codes. 
 
