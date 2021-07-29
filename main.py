@@ -11,6 +11,7 @@ from matplotlib import pyplot as plt
 
 import argparse
 import time
+import os.path
 
 
 DEBUG = False
@@ -596,75 +597,6 @@ def get_noisy_count(df, df_patients, eps_patient, synthetic=False):
     return count
 
 
-def visualize(df, df_patients):
-    plt.figure(figsize=(15, 15), dpi=150)
-
-    lat_mean, pmin = get_reference_xy(df)
-    p_patients = dataframeToXY(df_patients, lat_mean, pmin)
-    x, y = p_patients.T
-    plt.scatter(x, y, s=100, color='orange')
-
-    plt.grid()
-
-    plt.show()
-
-    return
-
-    uid = 24
-    df_id = df[df["id"] == uid]
-    eps_u = 2.0
-    p_id = dataframeToXY(df_id, lat_mean, pmin)
-    flag, idx = check_points(p_id, p_patients, 5)
-    x, y = p_id.T
-    plt.scatter(x, y, color='black')
-
-    print("is user: ", uid, " a close contact?: ", flag)
-    print("now idx: ", idx)
-
-    df_id_39 = df[df["id"] == 39]
-    p_id_39 = dataframeToXY(df_id_39, lat_mean, pmin)
-    x, y = p_id_39.T
-    # plt.scatter(x, y, color='black')
-
-    if False:
-        noisy_count = get_noisy_count(df, df_patients)
-        noisy_points = gen_noise_with_noisy_count(p_id, noisy_count, eps_u)
-        print(noisy_points)
-        x, y = noisy_points.T
-        plt.scatter(x, y, color='orange')
-
-        flag, idx = check_points(noisy_points, p_patients, 80)
-        print("tested close contact by my method?: ", flag)
-
-    for i in range(len(p_id)-1):
-        x = [p_id[i][0], p_id[i+1][0]]
-        y = [p_id[i][1], p_id[i+1][1]]
-        plt.arrow(x[0], y[0], x[1] - x[0], y[1] - y[0], width=2, head_width=40, head_length=50, color='black', length_includes_head=True)
-        # plt.plot(x, y, color='blue')
-
-    for i in range(len(p_id_39)-5):
-        x = [p_id_39[i][0], p_id_39[i+1][0]]
-        y = [p_id_39[i][1], p_id_39[i+1][1]]
-        plt.arrow(x[0], y[0], x[1] - x[0], y[1] - y[0], head_width=40, head_length=50, width=2, length_includes_head=True)
-        plt.scatter(x, y, color='black')
-
-    for p in p_id:
-        for p_t in p_patients:
-            if eula_dist(p, p_t) < 5:
-                x, y = p.T
-                plt.scatter(x, y, color='red')
-
-    for p in p_id_39:
-        for p_t in p_patients:
-            if eula_dist(p, p_t) < 5:
-                x, y = p.T
-                plt.scatter(x, y, color='yellow')
-
-    plt.grid()
-
-    plt.show()
-
-
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--eps_P', type=float, default=2.0,
@@ -675,18 +607,19 @@ def parse_arguments():
     parser.add_argument('--num_users', type=int, default=200, help='Number of users.')
     parser.add_argument('--randomly', action='store_true', default=False,
                         help='Random select patients.')
+    parser.add_argument('--synthetic', action='store_true', default=False,
+                        help='Synthetic dataset or not.')
     parser.add_argument('--gen_synthetic', action='store_true', default=False,
                         help='Generate synthetic dataset.')
     parser.add_argument('--random_start', type=int, default=150, help='random start.')
-    parser.add_argument('--num_rounds', type=int, default=1, help='Number of rounds.')
-
+    parser.add_argument('--num_rounds', type=int, default=10, help='Number of rounds.')
 
     args = parser.parse_args()
     return args
 
 
-def main():
-    args = parse_arguments()
+def main(args):
+    # args = parse_arguments()
     df, uids = load_data(num_users=args.num_users)
     num_experiments = args.num_rounds
     result = []
@@ -707,11 +640,6 @@ def main():
         averaged = [method, result['recall_' + method].mean(), result['precision_' + method].mean(),
                     result['f1_' + method].mean(), result['time_' + method].mean()*1000, result['acc_' + method].mean()]
         final.append(averaged)
-
-        #final['recall_' + method] = result['recall_' + method].mean()
-        #final['precision_' + method] = result['precision_' + method].mean()
-        #final['f1_' + method] = result['f1_' + method].mean()
-        #final['time_' + method] = result['time_' + method].mean()*1000 # showing ms
 
     df_result = pd.DataFrame(final, columns=['METHOD', 'RECALL', 'PRECISION', 'F1', 'TIME', 'ACC'])
     df_result = df_result.set_index('METHOD')
@@ -742,8 +670,11 @@ def gen_synthetic():
 
 
 def compare_synthetic(args):
+    file_str = 'df_synthetic_'+str(100000)+'.csv'
+    if not os.path.isfile(file_str):
+        file_str = 'df_synthetic_'+str(1600)+'.csv'
 
-    df = pd.read_csv('df_synthetic_'+str(100000)+'.csv', sep='\t', header=None)
+    df = pd.read_csv(file_str, sep='\t', header=None)
     df.columns = ['rid', 'id', 'time', 'x', 'y', 'locId']
     uids = df.id.unique()
 
@@ -773,11 +704,6 @@ def compare_synthetic(args):
                     result['f1_' + method].mean(), result['time_' + method].mean() * 1000]
         final.append(averaged)
 
-        # final['recall_' + method] = result['recall_' + method].mean()
-        # final['precision_' + method] = result['precision_' + method].mean()
-        # final['f1_' + method] = result['f1_' + method].mean()
-        # final['time_' + method] = result['time_' + method].mean()*1000 # showing ms
-
     df_result = pd.DataFrame(final, columns=['METHOD', 'RECALL', 'PRECISION', 'F1', 'TIME'])
     df_result = df_result.set_index('METHOD')
     print(args)
@@ -791,6 +717,8 @@ if __name__ == '__main__':
     if args.gen_synthetic:
         gen_synthetic()
     else:
-        main(args)
-    #compare_synthetic()
+        if args.synthetic:
+            compare_synthetic(args)
+        else:
+            main(args)
 
