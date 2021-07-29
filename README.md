@@ -4,8 +4,13 @@ We publish the source codes for the experiments for the submission.
 
 ## Environment:
 
-Python: 3.9.2
+Python: 3.9.2 
+
+We install the packages with conda, and the requirements file are exported at `requirements.txt`. 
+
 OS: Linux
+
+
 
 ## Prepare the dataset:
 
