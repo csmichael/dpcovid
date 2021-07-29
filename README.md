@@ -1,8 +1,11 @@
-# dpcovid_code
+# Code for ICDE submission 
 
-We publish the source codes for the experiments.
+We publish the source codes for the experiments for the submission. 
 
-main.py contains the main codes. 
+## Environment:
+
+Python: 3.9.2
+OS: Linux
 
 ## Prepare the dataset:
 
