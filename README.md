@@ -1,4 +1,4 @@
-# Code for ICDE submission 
+# Code for SIGMOD submission 
 
 We publish the source codes for the experiments for the submission. 
 
