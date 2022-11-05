@@ -1,4 +1,4 @@
-# Code for SIGMOD submission 
+# Code for DASFAA submission 
 
 We publish the source codes for the experiments for the submission. 
 
